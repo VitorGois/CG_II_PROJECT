@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private Rigidbody rb;
-    public float forceMultiplier = 3f;
+    public float forceMultiplier = 6f;
     public float maximumVelocity = 3f;
 
     // Start is called before the first frame update
