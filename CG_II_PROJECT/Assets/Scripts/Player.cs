@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private Rigidbody rb;
-    public float forceMultiplier = 12f;
+    public float forceMultiplier = 30f;
     public float maximumVelocity = 5f;
 
     // Start is called before the first frame update
@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Hazard"))
         {
+            GameManager.GameOver();
             Destroy(gameObject);
         } 
     }
