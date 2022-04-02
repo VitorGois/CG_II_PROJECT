@@ -436,6 +436,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   forceMultiplier: 18
   maximumVelocity: 5
+  deathParticles: {fileID: 4997727494809515186, guid: 5e037bd6406cd3f4982aad1bf831ebd9, type: 3}
 --- !u!1001 &216842818
 PrefabInstance:
   m_ObjectHideFlags: 0

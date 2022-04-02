@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     private Rigidbody rb;
     public float forceMultiplier = 30f;
     public float maximumVelocity = 5f;
+    public ParticleSystem deathParticles;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +30,9 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Hazard"))
         {
+            
             GameManager.GameOver();
+            Instantiate(deathParticles, transform.position, Quaternion.identity);
             Destroy(gameObject);
         } 
     }
