@@ -1,26 +1,79 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
 
-    public GameObject hazardPrefab;
-    public int maxHazardToSpawn = 3;
-    public TMPro.TextMeshPro scoreText;
+    [SerializeField]
+    private int maxHazardToSpawn = 3;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI scoreText;
+
+    [SerializeField]
+    private Image backgroundMenu;
+
+    [SerializeField]
+    private GameObject gameOverMenu;
+
+    [SerializeField]
+    private GameObject hazardPrefab;
+
+    [SerializeField]
+    private GameObject mainVCam;
+
+    [SerializeField]
+    private GameObject player;
+
+    [SerializeField]
+    private GameObject zoomVCam;
 
     private int score;
     private float timer;
-    private static bool gameOver;
+    private bool gameOver;
+    private Coroutine hazardsCoroutine;
+    private static GameManager instance;
+    public static GameManager Instance => instance;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(SpawnHazards());
+        instance = this;
+    }
+
+    private void OnEnable()
+    {
+        player.SetActive(true);
+
+                
+        mainVCam.SetActive(true);
+        zoomVCam.SetActive(false);
+
+        gameOver = false;
+        scoreText.text = "0";
+        score = 0;
+        timer = 0;
+
+        hazardsCoroutine = StartCoroutine(SpawnHazards());
     }
 
     private void Update() 
-    {
+    {   
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (Time.timeScale == 0) 
+            {
+                Resume();
+            }
+            if (Time.timeScale == 1) 
+            {
+                Pause();
+            }
+        }
+
         if (gameOver) return;
 
         timer += Time.deltaTime;
@@ -31,6 +84,30 @@ public class GameManager : MonoBehaviour
             scoreText.text = score.ToString();
             timer = 0;
         }
+    }
+
+    private void Pause()
+    {
+        LeanTween.value(1, 0, 0.5f)
+            .setOnUpdate(SetTimeScale)
+            .setIgnoreTimeScale(true);
+        
+        backgroundMenu.gameObject.SetActive(true);
+    }
+
+    private void Resume()
+    {
+        LeanTween.value(0, 1, 0.5f)
+            .setOnUpdate(SetTimeScale)
+            .setIgnoreTimeScale(true);
+
+        backgroundMenu.gameObject.SetActive(false);
+    }
+
+    private void SetTimeScale(float value)
+    {
+        Time.timeScale = value;
+        Time.fixedDeltaTime = 0.02f * value;
     }
 
     private IEnumerator SpawnHazards()
@@ -50,9 +127,26 @@ public class GameManager : MonoBehaviour
         yield return SpawnHazards();
     }
 
-    public static void GameOver()
+    public void GameOver()
     {
+        StopCoroutine(hazardsCoroutine);
         gameOver = true;
+
+        if (Time.timeScale < 1)
+        {
+            Resume();
+        }
+
+        mainVCam.SetActive(false);
+        zoomVCam.SetActive(true);
+
+        gameObject.SetActive(false);
+        gameOverMenu.SetActive(true);
+    }
+
+     public void Enable()
+    {
+        gameObject.SetActive(true);
     }
 
 }
