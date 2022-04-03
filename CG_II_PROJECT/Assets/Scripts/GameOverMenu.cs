@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class GameOver : MonoBehaviour
+public class GameOverMenu : MonoBehaviour
 {
     private LTDescr restartAnimation;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI highScore;
     
     private void OnEnable()
     {
+        highScore.text = $"High Score: {GameManager.Instance.HighScore}";
 
         var RectTransform = GetComponent<RectTransform>();
         RectTransform.anchoredPosition = new Vector2(0, RectTransform.rect.height);

@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     private TMPro.TextMeshProUGUI scoreText;
 
     [SerializeField]
-    private Image backgroundMenu;
+    private Image pauseMenu;
 
     [SerializeField]
     private GameObject gameOverMenu;
@@ -30,18 +30,22 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject zoomVCam;
 
+    private int highScore;
     private int score;
     private float timer;
     private bool gameOver;
     private Coroutine hazardsCoroutine;
     private static GameManager instance;
+    private const string HighScorePreferenceKey = "High Score";
     public static GameManager Instance => instance;
+    public int HighScore => highScore;
 
 
     // Start is called before the first frame update
     void Start()
     {
         instance = this;
+        highScore = PlayerPrefs.GetInt(HighScorePreferenceKey);
     }
 
     private void OnEnable()
@@ -92,7 +96,7 @@ public class GameManager : MonoBehaviour
             .setOnUpdate(SetTimeScale)
             .setIgnoreTimeScale(true);
         
-        backgroundMenu.gameObject.SetActive(true);
+        pauseMenu.gameObject.SetActive(true);
     }
 
     private void Resume()
@@ -101,7 +105,7 @@ public class GameManager : MonoBehaviour
             .setOnUpdate(SetTimeScale)
             .setIgnoreTimeScale(true);
 
-        backgroundMenu.gameObject.SetActive(false);
+        pauseMenu.gameObject.SetActive(false);
     }
 
     private void SetTimeScale(float value)
@@ -135,6 +139,12 @@ public class GameManager : MonoBehaviour
         if (Time.timeScale < 1)
         {
             Resume();
+        }
+
+        if (score > highScore)
+        {
+            highScore = score;
+            PlayerPrefs.SetInt(HighScorePreferenceKey, highScore);
         }
 
         mainVCam.SetActive(false);
