@@ -17,7 +17,6 @@ public class Player : MonoBehaviour
     private Rigidbody rb;
     private CinemachineImpulseSource cinemachineImpulseSource; 
     
-    // Start is called before the first frame update
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -50,10 +49,25 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Hazard"))
         {
-            GameManager.Instance.GameOver();
-            gameObject.SetActive(false);
+            GameOver();
+
             Instantiate(deathParticles, transform.position, Quaternion.identity);
             cinemachineImpulseSource.GenerateImpulse();
         } 
     }
+
+    private void OnTriggerExit(Collider other) {
+        if (other.CompareTag("FallDown"))
+        {
+            GameOver();
+        }
+    }
+
+    private void GameOver()
+    {
+        GameManager.Instance.GameOver();
+
+        gameObject.SetActive(false);
+    }
+
 }
