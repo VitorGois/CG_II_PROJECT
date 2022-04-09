@@ -6,10 +6,10 @@ public class Player : MonoBehaviour
 {
 
     [SerializeField]
-    private float forceMultiplier = 25f;
+    private float forceMultiplier = 100;
 
     [SerializeField]
-    private float maximumVelocity = 3.5f;
+    private float maximumVelocity = 4f;
 
     [SerializeField]
     private ParticleSystem deathParticles;
