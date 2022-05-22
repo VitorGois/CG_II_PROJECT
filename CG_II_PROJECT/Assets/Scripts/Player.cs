@@ -6,7 +6,7 @@ public class Player : MonoBehaviour
 {
 
     [SerializeField]
-    private float forceMultiplier = 100;
+    private float forceMultiplier = 1000;
 
     [SerializeField]
     private float maximumVelocity = 4f;
@@ -15,8 +15,8 @@ public class Player : MonoBehaviour
     private ParticleSystem deathParticles;
 
     private Rigidbody rb;
-    private CinemachineImpulseSource cinemachineImpulseSource; 
-    
+    private CinemachineImpulseSource cinemachineImpulseSource;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
         {
             return;
         }
+
         var horizontalInput = Input.GetAxis("Horizontal");
 
         if (rb.velocity.magnitude <= maximumVelocity)
@@ -45,7 +46,7 @@ public class Player : MonoBehaviour
         rb.velocity = Vector3.zero;
     }
 
-    private void OnCollisionEnter(Collision collision) 
+    private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Hazard"))
         {
@@ -53,10 +54,11 @@ public class Player : MonoBehaviour
 
             Instantiate(deathParticles, transform.position, Quaternion.identity);
             cinemachineImpulseSource.GenerateImpulse();
-        } 
+        }
     }
 
-    private void OnTriggerExit(Collider other) {
+    private void OnTriggerExit(Collider other)
+    {
         if (other.CompareTag("FallDown"))
         {
             GameOver();

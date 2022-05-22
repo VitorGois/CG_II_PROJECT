@@ -17,12 +17,12 @@ public class Coin : MonoBehaviour
 
             GameManager.Instance.SetScore();
             Destroy(gameObject);
-            Instantiate(breakingEffect, transform.position, Quaternion.identity);
+            //Instantiate(breakingEffect, transform.position, Quaternion.identity);
         }
         else if (!collision.gameObject.CompareTag("Hazard"))
         {
             Destroy(gameObject);
-            Instantiate(breakingEffect, transform.position, Quaternion.identity);
+            //Instantiate(breakingEffect, transform.position, Quaternion.identity);
         }
     }
 }
