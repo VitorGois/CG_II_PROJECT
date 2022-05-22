@@ -12,7 +12,7 @@ public class SpawnTrigger_Island2 : MonoBehaviour
             GameManager.spawnRangeLeft = 18f;
             GameManager.spawnRangeRight = 32f;
             GameManager.maxHazardToSpawn = 3;
-            GameManager.maxCoinToSpawn = 2;
+            GameManager.maxCoinToSpawn = 3;
             GameManager.spawnDrag = 2f;
             //gameObject.GetComponent<BoxCollider>().enabled = true;
         }

@@ -137,17 +137,17 @@ public class GameManager : MonoBehaviour
         score++;
         scoreText.text = score.ToString();
 
-        //if (score == 2)
-        //{
-        //    AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(0f, 1.3f, 12.34f));
-        //    platform1.SetActive(true);
-        //}
-        //if (score == 4)
-        //{
-        //    AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(25f, 1.3f, 12.34f));
-        //    platform2.SetActive(true);
-        //}
         if (score == 2)
+        {
+            AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(0f, 1.3f, 12.34f));
+            platform1.SetActive(true);
+        }
+        if (score == 5)
+        {
+            AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(25f, 1.3f, 12.34f));
+            platform2.SetActive(true);
+        }
+        if (score == 10)
         {
             AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(50f, 1.3f, 12.34f));
             WinGame();
