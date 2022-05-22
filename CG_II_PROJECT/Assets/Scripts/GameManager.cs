@@ -5,12 +5,17 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-
-    [SerializeField]
-    private int maxHazardToSpawn = 3;
+    public static int maxHazardToSpawn;
+    public static int maxCoinToSpawn;
+    public static float spawnRangeLeft;
+    public static float spawnRangeRight;
+    public static float spawnDrag;
 
     [SerializeField]
     private TMPro.TextMeshProUGUI scoreText;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI lifeText;
 
     [SerializeField]
     private Image pauseMenu;
@@ -19,7 +24,13 @@ public class GameManager : MonoBehaviour
     private GameObject gameOverMenu;
 
     [SerializeField]
+    private GameObject winGameMenu;
+
+    [SerializeField]
     private GameObject hazardPrefab;
+
+    [SerializeField]
+    private GameObject coinPrefab;
 
     [SerializeField]
     private GameObject mainVCam;
@@ -28,18 +39,52 @@ public class GameManager : MonoBehaviour
     private GameObject player;
 
     [SerializeField]
+    private GameObject platform1;
+
+    [SerializeField]
+    private GameObject platform2;
+
+    [SerializeField]
     private GameObject zoomVCam;
 
     private int highScore;
     private int score;
-    private float timer;
-    private bool gameOver;
+    public static int lifes;
+    private bool gameOver = false;
+    private bool winGame = false;
+
     private Coroutine hazardsCoroutine;
-    private static GameManager instance;
+    private Coroutine coinsCoroutine;
+
     private const string HighScorePreferenceKey = "High Score";
-    public static GameManager Instance => instance;
     public int HighScore => highScore;
 
+    private static GameManager instance;
+    public static GameManager Instance => instance;
+
+    public AudioClip clipNextLevel; 
+    public AudioClip clipDie;
+
+    // Use this for initialization
+    void Awake()
+    {
+        // For the island_1 set this on awake.
+        spawnRangeLeft = -7;
+        spawnRangeRight = 7;
+        maxHazardToSpawn = 2;
+        maxCoinToSpawn = 2;
+        spawnDrag = 1.5f;
+
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -50,18 +95,23 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        player.SetActive(true);
+        GetComponent<AudioSource>().Play();
+        GetComponent<AudioSource>().volume = 0.03f;
+        GetComponent<AudioSource>().loop = true;
 
+        player.SetActive(true);
                 
         mainVCam.SetActive(true);
         zoomVCam.SetActive(false);
 
         gameOver = false;
-        scoreText.text = "0";
+        scoreText.text = "0";        
         score = 0;
-        timer = 0;
+        lifeText.text = "3";
+        lifes = 3;
 
         hazardsCoroutine = StartCoroutine(SpawnHazards());
+        coinsCoroutine = StartCoroutine(SpawnCoins());
     }
 
     private void Update() 
@@ -79,19 +129,48 @@ public class GameManager : MonoBehaviour
         }
 
         if (gameOver) return;
+        if (winGame) return;
+    }
 
-        timer += Time.deltaTime;
+    public void SetScore()
+    {
+        score++;
+        scoreText.text = score.ToString();
 
-        if (timer >= 1f)
+        if (score == 2)
         {
-            score++;
-            scoreText.text = score.ToString();
-            timer = 0;
+            AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(0f, 1.3f, 12.34f));
+            platform1.SetActive(true);
+        }
+        if (score == 5)
+        {
+            AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(25f, 1.3f, 12.34f));
+            platform2.SetActive(true);
+        }
+        if (score == 10)
+        {
+            AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(50f, 1.3f, 12.34f));
+            WinGame();
+        }
+    }
+
+    public void SetLife()
+    {
+        AudioSource.PlayClipAtPoint(clipDie, transform.position);
+
+        lifes--;
+        lifeText.text = lifes.ToString();
+
+        if (lifes == 0)
+        {
+            GameOver();
         }
     }
 
     private void Pause()
     {
+        GetComponent<AudioSource>().Pause();
+
         LeanTween.value(1, 0, 0.5f)
             .setOnUpdate(SetTimeScale)
             .setIgnoreTimeScale(true);
@@ -101,6 +180,8 @@ public class GameManager : MonoBehaviour
 
     private void Resume()
     {
+        GetComponent<AudioSource>().Play();
+
         LeanTween.value(0, 1, 0.5f)
             .setOnUpdate(SetTimeScale)
             .setIgnoreTimeScale(true);
@@ -120,8 +201,8 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < hazardToSpawn; i++) 
         {
-            var x = Random.Range(-7, 7);
-            var drag = Random.Range(0f, 2f);
+            var x = Random.Range(spawnRangeLeft, spawnRangeRight);
+            var drag = Random.Range(0f, spawnDrag);
             var hazard = Instantiate(hazardPrefab, new Vector3(x, 11, 0), Quaternion.identity);
             hazard.GetComponent<Rigidbody>().drag = drag;
         }
@@ -131,9 +212,27 @@ public class GameManager : MonoBehaviour
         yield return SpawnHazards();
     }
 
+    private IEnumerator SpawnCoins()
+    {
+
+        var coinToSpawn = Random.Range(1, maxCoinToSpawn);
+
+        for (int i = 0; i < coinToSpawn; i++)
+        {
+            var x = Random.Range(spawnRangeLeft, spawnRangeRight);
+            var drag = Random.Range(0f, 2f);
+            var coin = Instantiate(coinPrefab, new Vector3(x, 11, 0), Quaternion.identity);
+            coin.GetComponent<Rigidbody>().drag = drag;
+        }
+
+        yield return new WaitForSeconds(3f);
+
+        yield return SpawnCoins();
+    }
+
     public void GameOver()
     {
-        StopCoroutine(hazardsCoroutine);
+        StopAllCoroutines();
         gameOver = true;
 
         if (Time.timeScale < 1)
@@ -154,7 +253,30 @@ public class GameManager : MonoBehaviour
         gameOverMenu.SetActive(true);
     }
 
-     public void Enable()
+    public void WinGame()
+    {
+        StopAllCoroutines();
+        winGame = true;
+
+        if (Time.timeScale < 1)
+        {
+            Resume();
+        }
+
+        if (score > highScore)
+        {
+            highScore = score;
+            PlayerPrefs.SetInt(HighScorePreferenceKey, highScore);
+        }
+
+        mainVCam.SetActive(false);
+        zoomVCam.SetActive(true);
+
+        gameObject.SetActive(false);
+        winGameMenu.SetActive(true);
+    }
+
+    public void Enable()
     {
         gameObject.SetActive(true);
     }

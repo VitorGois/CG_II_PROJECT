@@ -4,9 +4,8 @@ using UnityEngine;
 using Cinemachine;
 public class Player : MonoBehaviour
 {
-
     [SerializeField]
-    private float forceMultiplier = 100;
+    private float forceMultiplier = 1000;
 
     [SerializeField]
     private float maximumVelocity = 4f;
@@ -15,8 +14,12 @@ public class Player : MonoBehaviour
     private ParticleSystem deathParticles;
 
     private Rigidbody rb;
-    private CinemachineImpulseSource cinemachineImpulseSource; 
-    
+    private CinemachineImpulseSource cinemachineImpulseSource;
+
+    public Transform checkpoint1;
+    public Transform checkpoin2;
+    public Transform checkpoint3;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -30,6 +33,7 @@ public class Player : MonoBehaviour
         {
             return;
         }
+
         var horizontalInput = Input.GetAxis("Horizontal");
 
         if (rb.velocity.magnitude <= maximumVelocity)
@@ -45,29 +49,37 @@ public class Player : MonoBehaviour
         rb.velocity = Vector3.zero;
     }
 
-    private void OnCollisionEnter(Collision collision) 
+    private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Hazard"))
         {
-            GameOver();
+            Transform checkpoint;
 
+            Debug.Log(collision.transform.position);
+            if (collision.transform.position.x >= -7f && collision.gameObject.transform.position.x <= 7f)
+            {
+                checkpoint = checkpoint1;
+            } 
+            else if (collision.transform.position.x >= 18f && collision.gameObject.transform.position.x <= 32f)
+            {
+                checkpoint = checkpoin2;
+            } 
+            else
+            {
+                checkpoint = checkpoint3;
+            }
+
+            gameObject.SetActive(false);
             Instantiate(deathParticles, transform.position, Quaternion.identity);
             cinemachineImpulseSource.GenerateImpulse();
-        } 
-    }
+            GameManager.Instance.SetLife();
 
-    private void OnTriggerExit(Collider other) {
-        if (other.CompareTag("FallDown"))
-        {
-            GameOver();
+            if (GameManager.lifes != 0)
+            {
+                gameObject.SetActive(true);
+                transform.position = checkpoint.position;
+                transform.rotation = checkpoint.rotation;
+            }
         }
     }
-
-    private void GameOver()
-    {
-        GameManager.Instance.GameOver();
-
-        gameObject.SetActive(false);
-    }
-
 }
