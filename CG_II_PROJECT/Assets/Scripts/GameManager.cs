@@ -15,6 +15,9 @@ public class GameManager : MonoBehaviour
     private TMPro.TextMeshProUGUI scoreText;
 
     [SerializeField]
+    private TMPro.TextMeshProUGUI lifeText;
+
+    [SerializeField]
     private Image pauseMenu;
 
     [SerializeField]
@@ -49,6 +52,7 @@ public class GameManager : MonoBehaviour
 
     private int highScore;
     private int score;
+    public static int lifes;
     private bool gameOver;
 
     private Coroutine hazardsCoroutine;
@@ -60,7 +64,8 @@ public class GameManager : MonoBehaviour
     private static GameManager instance;
     public static GameManager Instance => instance;
 
-    public AudioClip clipNextLevel;
+    public AudioClip clipNextLevel; 
+    public AudioClip clipDie;
 
     // Use this for initialization
     void Awake()
@@ -102,8 +107,10 @@ public class GameManager : MonoBehaviour
         zoomVCam.SetActive(false);
 
         gameOver = false;
-        scoreText.text = "0";
+        scoreText.text = "0";        
         score = 0;
+        lifeText.text = "3";
+        lifes = 3;
 
         hazardsCoroutine = StartCoroutine(SpawnHazards());
         coinsCoroutine = StartCoroutine(SpawnCoins());
@@ -147,6 +154,19 @@ public class GameManager : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(50f, 1.3f, 12.34f));
             platform2.SetActive(true);
+        }
+    }
+
+    public void SetLife()
+    {
+        AudioSource.PlayClipAtPoint(clipDie, transform.position);
+
+        lifes--;
+        lifeText.text = lifes.ToString();
+
+        if (lifes == 0)
+        {
+            GameOver();
         }
     }
 

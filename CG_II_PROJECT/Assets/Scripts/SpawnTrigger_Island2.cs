@@ -14,7 +14,7 @@ public class SpawnTrigger_Island2 : MonoBehaviour
             GameManager.maxHazardToSpawn = 3;
             GameManager.maxCoinToSpawn = 2;
             GameManager.spawnDrag = 2f;
-            gameObject.GetComponent<BoxCollider>().enabled = true;
+            //gameObject.GetComponent<BoxCollider>().enabled = true;
         }
     }
 }
