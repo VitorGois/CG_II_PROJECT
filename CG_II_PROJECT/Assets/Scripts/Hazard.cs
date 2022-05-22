@@ -36,7 +36,7 @@ public class Hazard : MonoBehaviour
             AudioSource.PlayClipAtPoint(clip, gameObject.transform.position, 0.8f);
 
             Destroy(gameObject);
-            Instantiate(breakingEffect,transform.position, Quaternion.identity);
+            Instantiate(breakingEffect, transform.position, Quaternion.identity);
 
             if (player != null)
             {
