@@ -13,12 +13,16 @@ public class Hazard : MonoBehaviour
     private CinemachineImpulseSource cinemachineImpulseSource; 
     private Player player;
 
+    public AudioClip clip;
+
     private void Start() {
         cinemachineImpulseSource = GetComponent<CinemachineImpulseSource>();
         player = FindObjectOfType<Player>();
 
         var xRotation = Random.Range(90f, 180f);
         rotation = new Vector3(-xRotation, 0);
+
+        gameObject.SetActive(true);
     }
 
     private void Update() {
@@ -27,9 +31,11 @@ public class Hazard : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision) 
     {
-        if (!collision.gameObject.CompareTag("Hazard"))
+        if (!collision.gameObject.CompareTag("Hazard") && !collision.gameObject.CompareTag("Coin"))
         {
-            Destroy(gameObject); 
+            AudioSource.PlayClipAtPoint(clip, gameObject.transform.position, 0.8f);
+
+            Destroy(gameObject);
             Instantiate(breakingEffect,transform.position, Quaternion.identity);
 
             if (player != null)

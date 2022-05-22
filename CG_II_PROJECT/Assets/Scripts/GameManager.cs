@@ -10,6 +10,9 @@ public class GameManager : MonoBehaviour
     private int maxHazardToSpawn = 3;
 
     [SerializeField]
+    private int maxCoinToSpawn = 1;
+
+    [SerializeField]
     private TMPro.TextMeshProUGUI scoreText;
 
     [SerializeField]
@@ -22,6 +25,9 @@ public class GameManager : MonoBehaviour
     private GameObject hazardPrefab;
 
     [SerializeField]
+    private GameObject coinPrefab;
+
+    [SerializeField]
     private GameObject mainVCam;
 
     [SerializeField]
@@ -32,14 +38,32 @@ public class GameManager : MonoBehaviour
 
     private int highScore;
     private int score;
-    private float timer;
     private bool gameOver;
+
     private Coroutine hazardsCoroutine;
-    private static GameManager instance;
+    private Coroutine coinsCoroutine;
+
     private const string HighScorePreferenceKey = "High Score";
-    public static GameManager Instance => instance;
     public int HighScore => highScore;
 
+    private static GameManager instance;
+    public static GameManager Instance => instance;
+
+    public AudioClip clipNextLevel;
+
+    // Use this for initialization
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -50,8 +74,9 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        player.SetActive(true);
+        GetComponent<AudioSource>().Play();
 
+        player.SetActive(true);
                 
         mainVCam.SetActive(true);
         zoomVCam.SetActive(false);
@@ -59,9 +84,9 @@ public class GameManager : MonoBehaviour
         gameOver = false;
         scoreText.text = "0";
         score = 0;
-        timer = 0;
 
         hazardsCoroutine = StartCoroutine(SpawnHazards());
+        coinsCoroutine = StartCoroutine(SpawnCoins());
     }
 
     private void Update() 
@@ -79,19 +104,24 @@ public class GameManager : MonoBehaviour
         }
 
         if (gameOver) return;
+    }
 
-        timer += Time.deltaTime;
+    public void SetScore()
+    {
+        score++;
+        scoreText.text = score.ToString();
 
-        if (timer >= 1f)
+        if (score > 2)
         {
-            score++;
-            scoreText.text = score.ToString();
-            timer = 0;
+            AudioSource.PlayClipAtPoint(clipNextLevel, Camera.main.transform.position);
+            Pause(); // TODO: Implements plataform appears logic
         }
     }
 
     private void Pause()
     {
+        GetComponent<AudioSource>().Pause();
+
         LeanTween.value(1, 0, 0.5f)
             .setOnUpdate(SetTimeScale)
             .setIgnoreTimeScale(true);
@@ -101,6 +131,8 @@ public class GameManager : MonoBehaviour
 
     private void Resume()
     {
+        GetComponent<AudioSource>().Play();
+
         LeanTween.value(0, 1, 0.5f)
             .setOnUpdate(SetTimeScale)
             .setIgnoreTimeScale(true);
@@ -131,9 +163,28 @@ public class GameManager : MonoBehaviour
         yield return SpawnHazards();
     }
 
+    private IEnumerator SpawnCoins()
+    {
+
+        var coinToSpawn = Random.Range(1, maxCoinToSpawn);
+
+        for (int i = 0; i < coinToSpawn; i++)
+        {
+            var x = Random.Range(-7, 7);
+            var drag = Random.Range(0f, 2f);
+            var coin = Instantiate(coinPrefab, new Vector3(x, 11, 0), Quaternion.identity);
+            coin.GetComponent<Rigidbody>().drag = drag;
+        }
+
+        yield return new WaitForSeconds(3f);
+
+        yield return SpawnCoins();
+    }
+
     public void GameOver()
     {
         StopCoroutine(hazardsCoroutine);
+        StopCoroutine(coinsCoroutine);
         gameOver = true;
 
         if (Time.timeScale < 1)
@@ -154,7 +205,7 @@ public class GameManager : MonoBehaviour
         gameOverMenu.SetActive(true);
     }
 
-     public void Enable()
+    public void Enable()
     {
         gameObject.SetActive(true);
     }
