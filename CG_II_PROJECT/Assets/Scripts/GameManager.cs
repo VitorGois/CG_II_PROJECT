@@ -5,12 +5,11 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-
-    [SerializeField]
-    private int maxHazardToSpawn = 3;
-
-    [SerializeField]
-    private int maxCoinToSpawn = 1;
+    public static int maxHazardToSpawn;
+    public static int maxCoinToSpawn;
+    public static float spawnRangeLeft;
+    public static float spawnRangeRight;
+    public static float spawnDrag;
 
     [SerializeField]
     private TMPro.TextMeshProUGUI scoreText;
@@ -34,6 +33,18 @@ public class GameManager : MonoBehaviour
     private GameObject player;
 
     [SerializeField]
+    private GameObject platform1;
+
+    [SerializeField]
+    private GameObject platform2;
+
+    [SerializeField]
+    private GameObject spawnerTrigger_2;
+
+    [SerializeField]
+    private GameObject spawnerTrigger_3;
+
+    [SerializeField]
     private GameObject zoomVCam;
 
     private int highScore;
@@ -54,6 +65,13 @@ public class GameManager : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
+        // For the island_1 set this on awake.
+        spawnRangeLeft = -7;
+        spawnRangeRight = 7;
+        maxHazardToSpawn = 2;
+        maxCoinToSpawn = 2;
+        spawnDrag = 2f;
+
         if (instance == null)
         {
             instance = this;
@@ -113,10 +131,22 @@ public class GameManager : MonoBehaviour
         score++;
         scoreText.text = score.ToString();
 
-        if (score > 2)
+        if (score == 2)
         {
-            AudioSource.PlayClipAtPoint(clipNextLevel, Camera.main.transform.position);
-            Pause(); // TODO: Implements plataform appears logic
+            AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(0f, 1.3f, 12.34f));
+            platform1.SetActive(true);
+        }
+
+        if (score == 4)
+        {
+            AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(25f, 1.3f, 12.34f));
+            platform2.SetActive(true);
+        }
+
+        if (score == 7)
+        {
+            AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(50f, 1.3f, 12.34f));
+            platform2.SetActive(true);
         }
     }
 
@@ -154,8 +184,8 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < hazardToSpawn; i++) 
         {
-            var x = Random.Range(-7, 7);
-            var drag = Random.Range(0f, 2f);
+            var x = Random.Range(spawnRangeLeft, spawnRangeRight);
+            var drag = Random.Range(0f, spawnDrag);
             var hazard = Instantiate(hazardPrefab, new Vector3(x, 11, 0), Quaternion.identity);
             hazard.GetComponent<Rigidbody>().drag = drag;
         }
@@ -172,7 +202,7 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < coinToSpawn; i++)
         {
-            var x = Random.Range(-7, 7);
+            var x = Random.Range(spawnRangeLeft, spawnRangeRight);
             var drag = Random.Range(0f, 2f);
             var coin = Instantiate(coinPrefab, new Vector3(x, 11, 0), Quaternion.identity);
             coin.GetComponent<Rigidbody>().drag = drag;
@@ -188,6 +218,7 @@ public class GameManager : MonoBehaviour
         StopCoroutine(hazardsCoroutine);
         StopCoroutine(coinsCoroutine);
         gameOver = true;
+        score = 0;
 
         if (Time.timeScale < 1)
         {

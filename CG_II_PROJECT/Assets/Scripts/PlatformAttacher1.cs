@@ -2,13 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlatformAttacher : MonoBehaviour
+public class PlatformAttacher1 : MonoBehaviour
 {
+    public Animator anim;
+
     private void OnTriggerEnter(Collider other)
     {
         GameObject go = other.gameObject;
         if (go.CompareTag("Player"))
         {
+            anim.Play("Move_Platform_1");
+
             go.transform.parent = transform;
             go.transform.localScale = new Vector3(0.3f, 2f, 0.25f);
         }
