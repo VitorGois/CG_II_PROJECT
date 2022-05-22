@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     private GameObject gameOverMenu;
 
     [SerializeField]
+    private GameObject winGameMenu;
+
+    [SerializeField]
     private GameObject hazardPrefab;
 
     [SerializeField]
@@ -42,18 +45,13 @@ public class GameManager : MonoBehaviour
     private GameObject platform2;
 
     [SerializeField]
-    private GameObject spawnerTrigger_2;
-
-    [SerializeField]
-    private GameObject spawnerTrigger_3;
-
-    [SerializeField]
     private GameObject zoomVCam;
 
     private int highScore;
     private int score;
     public static int lifes;
-    private bool gameOver;
+    private bool gameOver = false;
+    private bool winGame = false;
 
     private Coroutine hazardsCoroutine;
     private Coroutine coinsCoroutine;
@@ -75,7 +73,7 @@ public class GameManager : MonoBehaviour
         spawnRangeRight = 7;
         maxHazardToSpawn = 2;
         maxCoinToSpawn = 2;
-        spawnDrag = 2f;
+        spawnDrag = 1.5f;
 
         if (instance == null)
         {
@@ -131,6 +129,7 @@ public class GameManager : MonoBehaviour
         }
 
         if (gameOver) return;
+        if (winGame) return;
     }
 
     public void SetScore()
@@ -138,22 +137,20 @@ public class GameManager : MonoBehaviour
         score++;
         scoreText.text = score.ToString();
 
+        //if (score == 2)
+        //{
+        //    AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(0f, 1.3f, 12.34f));
+        //    platform1.SetActive(true);
+        //}
+        //if (score == 4)
+        //{
+        //    AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(25f, 1.3f, 12.34f));
+        //    platform2.SetActive(true);
+        //}
         if (score == 2)
         {
-            AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(0f, 1.3f, 12.34f));
-            platform1.SetActive(true);
-        }
-
-        if (score == 4)
-        {
-            AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(25f, 1.3f, 12.34f));
-            platform2.SetActive(true);
-        }
-
-        if (score == 7)
-        {
             AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(50f, 1.3f, 12.34f));
-            platform2.SetActive(true);
+            WinGame();
         }
     }
 
@@ -235,10 +232,8 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        StopCoroutine(hazardsCoroutine);
-        StopCoroutine(coinsCoroutine);
+        StopAllCoroutines();
         gameOver = true;
-        score = 0;
 
         if (Time.timeScale < 1)
         {
@@ -256,6 +251,29 @@ public class GameManager : MonoBehaviour
 
         gameObject.SetActive(false);
         gameOverMenu.SetActive(true);
+    }
+
+    public void WinGame()
+    {
+        StopAllCoroutines();
+        winGame = true;
+
+        if (Time.timeScale < 1)
+        {
+            Resume();
+        }
+
+        if (score > highScore)
+        {
+            highScore = score;
+            PlayerPrefs.SetInt(HighScorePreferenceKey, highScore);
+        }
+
+        mainVCam.SetActive(false);
+        zoomVCam.SetActive(true);
+
+        gameObject.SetActive(false);
+        winGameMenu.SetActive(true);
     }
 
     public void Enable()
