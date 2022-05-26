@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour
         score++;
         scoreText.text = score.ToString();
 
-        if (score == 2)
+        if (score == 3)
         {
             AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(0f, 1.3f, 12.34f));
             platform1.SetActive(true);
@@ -147,7 +147,7 @@ public class GameManager : MonoBehaviour
             AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(25f, 1.3f, 12.34f));
             platform2.SetActive(true);
         }
-        if (score == 10)
+        if (score == 7)
         {
             AudioSource.PlayClipAtPoint(clipNextLevel, new Vector3(50f, 1.3f, 12.34f));
             WinGame();
