@@ -55,7 +55,6 @@ public class Player : MonoBehaviour
         {
             Transform checkpoint;
 
-            Debug.Log(collision.transform.position);
             if (collision.transform.position.x >= -7f && collision.gameObject.transform.position.x <= 7f)
             {
                 checkpoint = checkpoint1;

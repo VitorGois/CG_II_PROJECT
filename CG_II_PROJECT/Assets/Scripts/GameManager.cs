@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour
     public static float spawnRangeRight;
     public static float spawnDrag;
 
+    public Animator animPlatform1;
+    public Animator animPlatform2;
+
     [SerializeField]
     private TMPro.TextMeshProUGUI scoreText;
 
@@ -68,13 +71,6 @@ public class GameManager : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
-        // For the island_1 set this on awake.
-        spawnRangeLeft = -7;
-        spawnRangeRight = 7;
-        maxHazardToSpawn = 2;
-        maxCoinToSpawn = 2;
-        spawnDrag = 1.5f;
-
         if (instance == null)
         {
             instance = this;
@@ -95,6 +91,16 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
+        // For the island_1 set this on awake.
+        spawnRangeLeft = -7;
+        spawnRangeRight = 7;
+        maxHazardToSpawn = 2;
+        maxCoinToSpawn = 2;
+        spawnDrag = 1.5f;
+
+        animPlatform1.Play("idle", -1, 0f);
+        animPlatform2.Play("idle", -1, 0f);
+
         GetComponent<AudioSource>().Play();
         GetComponent<AudioSource>().volume = 0.03f;
         GetComponent<AudioSource>().loop = true;
@@ -280,5 +286,4 @@ public class GameManager : MonoBehaviour
     {
         gameObject.SetActive(true);
     }
-
 }
