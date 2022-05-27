@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEditor;
 
 public class WinGameMenu : MonoBehaviour
@@ -31,6 +32,7 @@ public class WinGameMenu : MonoBehaviour
     {
         restartAnimation.pause();
         gameObject.SetActive(false);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         GameManager.Instance.Enable();
     }
 

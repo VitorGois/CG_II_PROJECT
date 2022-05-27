@@ -11,9 +11,6 @@ public class GameManager : MonoBehaviour
     public static float spawnRangeRight;
     public static float spawnDrag;
 
-    public Animator animPlatform1;
-    public Animator animPlatform2;
-
     [SerializeField]
     private TMPro.TextMeshProUGUI scoreText;
 
@@ -69,7 +66,7 @@ public class GameManager : MonoBehaviour
     public AudioClip clipDie;
 
     // Use this for initialization
-    void Awake()
+    /*void Awake()
     {
         if (instance == null)
         {
@@ -80,27 +77,24 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
+    }*/
 
     // Start is called before the first frame update
     void Start()
     {
         instance = this;
         highScore = PlayerPrefs.GetInt(HighScorePreferenceKey);
-    }
 
-    private void OnEnable()
-    {
         // For the island_1 set this on awake.
         spawnRangeLeft = -7;
         spawnRangeRight = 7;
         maxHazardToSpawn = 2;
         maxCoinToSpawn = 2;
         spawnDrag = 1.5f;
+    }
 
-        animPlatform1.Play("idle", -1, 0f);
-        animPlatform2.Play("idle", -1, 0f);
-
+    private void OnEnable()
+    {
         GetComponent<AudioSource>().Play();
         GetComponent<AudioSource>().volume = 0.03f;
         GetComponent<AudioSource>().loop = true;
@@ -164,7 +158,9 @@ public class GameManager : MonoBehaviour
     {
         AudioSource.PlayClipAtPoint(clipDie, transform.position);
 
-        lifes--;
+        if(lifes > 0)
+            lifes--;
+
         lifeText.text = lifes.ToString();
 
         if (lifes == 0)

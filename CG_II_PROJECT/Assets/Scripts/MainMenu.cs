@@ -23,16 +23,17 @@ public class MainMenu : MonoBehaviour
 
     public void Play()
     {
-        GetComponent<CanvasGroup>().LeanAlpha(0, 0.02f).setOnComplete(OnComplete);
+        GetComponent<CanvasGroup>().LeanAlpha(0, 0.02f).setOnComplete(OnComplete);        
     }
 
     private void OnComplete()
     {
+        Debug.Log("oi");
         scoreRectTransform.LeanMoveY(-72f, 0.75f).setEaseOutBounce();
         lifesRectTransform.LeanMoveY(-72f, 0.75f).setEaseOutBounce();
 
-        gameManager.Enable();
         Destroy(gameObject);
+        gameManager.Enable();
     }
 }
 
