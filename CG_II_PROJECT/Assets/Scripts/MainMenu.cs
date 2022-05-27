@@ -28,7 +28,6 @@ public class MainMenu : MonoBehaviour
 
     private void OnComplete()
     {
-        Debug.Log("oi");
         scoreRectTransform.LeanMoveY(-72f, 0.75f).setEaseOutBounce();
         lifesRectTransform.LeanMoveY(-72f, 0.75f).setEaseOutBounce();
 
